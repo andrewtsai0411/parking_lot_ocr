@@ -8,16 +8,27 @@ results = reader.readtext(img_path, allowlist='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456
 
 x_points = []
 y_points = []
-for xi, yi in results[0][0]:
+
+if len(results) == 2: # 車牌號碼上方有'電動車'或縣市名稱等字
+    coordinates = results[1][0]
+    plate = results[1][-2]
+else:
+    coordinates = results[0][0]
+    plate = results[0][-2]
+
+for xi, yi in coordinates:
     x_points.append(xi)
     y_points.append(yi)
-# 取得左上、右下座標
-left_top = (min(x_points), min(y_points))
-right_buttom = (max(x_points), max(y_points))
+    # 取得左上、右下座標
+    left_top = (min(x_points), min(y_points))
+    right_buttom = (max(x_points), max(y_points))
 
 img = cv2.imread(img_path)
 cv2.rectangle(img, left_top, right_buttom, (0, 255, 0), 5)
-
 plt.imshow(img)
-plt.title(f'Plate number :{results[0][-2]}')
+plt.title(f'Plate number: {plate}')
+plt.xticks([])
+plt.yticks([])
 plt.show()
+
+ 

@@ -6,13 +6,17 @@ from datetime import timezone
 from datetime import timedelta
 
 parked_vehicles = dict()
+reader = easyocr.Reader(lang_list=['en'], gpu=False)
 
 def parking_lot_ocr(img_path: str, ntd_per_sec: int=1):
-    reader = easyocr.Reader(lang_list=['en'], gpu=False)
     results = reader.readtext(img_path, allowlist='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-',detail=0)
     entry_time = datetime.now(timezone.utc) + timedelta(hours=8)
     entry_time_str = entry_time.strftime('%Y-%m-%d %H:%M:%S')
-    car_plate = results[0]
+    
+    if len(results) == 2:
+        car_plate = results[1]
+    else:
+        car_plate = results[0]
 
     if car_plate not in parked_vehicles.keys(): # 進場
         parked_vehicles[car_plate] = entry_time
@@ -30,7 +34,5 @@ def parking_lot_ocr(img_path: str, ntd_per_sec: int=1):
         parked_vehicles.pop(car_plate, None)
 
 parking_lot_ocr('data/car_plate_1.jpg')
-print(parked_vehicles)
 time.sleep(random.randint(5,10))
 parking_lot_ocr('data/car_plate_1.jpg')
-print(parked_vehicles)
